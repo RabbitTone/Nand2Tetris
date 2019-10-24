@@ -1,10 +1,9 @@
 import java.util.Scanner;
 
-//import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
 
-//import sun.launcher.resources.launcher;
+import sun.launcher.resources.launcher;
 
-//import java.util.PrintWriter;
 import java.io.*;
 
 public class Main
@@ -14,11 +13,12 @@ public class Main
     Scanner keyboard = new Scanner(System.in);
     System.out.println("Enter name of file");
     String file = keyboard.nextLine();
-    //String bareName = file.substring(0, file.indexOf('.'));
+    String bareName = file.substring(0, file.indexOf('.'));
     
-    //PrintWriter pw = new PrintWriter(bareName + ".hack");
+    PrintWriter pw = new PrintWriter(bareName + ".hack");
     UtilityMethods um = new UtilityMethods();
-    Parser p = new Parser(file);
+    Parser pf = new Parser(file);
+    Parser ps = new Parser(file);
     Code code = new Code();
     int count = 16;
     String hold;
@@ -38,40 +38,37 @@ public class Main
     symT.addEntry("ARG", 2); symT.addEntry("THIS", 3);
     symT.addEntry("THAT", 4);
     
-    while(p.hasMoreCommands()) {
-      if(p.commandType() == 2){
-        symT.addEntry(p.symbol(), count);
+    while(pf.hasMoreCommands()) {
+      pf.advance();
+      if(pf.commandType() == 2){
+        symT.addEntry(pf.symbol(), count);
         count++;
       }
     }
-    while(p.hasMoreCommands()){
-      if(p.commandType() == 0){
-        hold = p.symbol();
+    while(ps.hasMoreCommands()){
+      ps.advance();
+      if(ps.commandType() == 0){
+        hold = ps.symbol();
         if(um.isNumeric(hold)){
-          System.out.println("0" + um.toBinary(Integer.parseInt(hold)));
+          pw.print("0" + um.toBinary(Integer.parseInt(hold)) +"\n");
         }
-        else{
-          if(symT.contains(hold)){
-            System.out.println("0" + um.toBinary(symT.getAddress(hold)));
+        else if(symT.contains(hold)){
+            pw.print("0" + um.toBinary(symT.getAddress(hold))+"\n");
           }
           else{
             symT.addEntry(hold, count);
             count++;
-            System.out.println("0" + um.toBinary(symT.getAddress(hold)));
+            pw.print("0" + um.toBinary(symT.getAddress(hold))+"\n");
           }
         }
-      }
-      else if(p.commandType() == 1){
-        String d = code.dest(p.dest());
-        String c = code.comp(p.comp());
-        String j = code.jump(p.jump());
+      else if(ps.commandType() == 1){
+        String d = code.dest(ps.dest());
+        String c = code.comp(ps.comp());
+        String j = code.jump(ps.jump());
 
-        System.out.println("111" + c + d + j + "\n");
-      }
-      else{
-
+        pw.print("111" + c + d + j+"\n");
       }
     }
-
+    pw.close();
   }
 }
